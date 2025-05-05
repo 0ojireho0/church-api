@@ -18,11 +18,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $redirectTo = "/dashboard";
+        $redirectTo = "/dashboard-admin";
 
         return response()->json([
             'message' => 'Login Successfull',
             'redirect_to' => $redirectTo
         ], 200);
+    }
+
+    public function destroy(Request $request): Response{
+
+        Auth::guard('admin')->logout();
+        // $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return response()->noContent();
     }
 }

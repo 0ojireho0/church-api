@@ -12,4 +12,6 @@ Route::middleware(['auth:admin'])->group(function(){
     Route::get('/user-admin', function(Request $request){
         return $request->user();
     });
+
+    Route::post('/logout-admin', [AuthenticatedSessionController::class, 'destroy']);
 });
