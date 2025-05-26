@@ -10,6 +10,8 @@ class Booking extends Model
 
     protected $fillable = [
         'user_id',
+        'church_id',
+        'wedding_rehearsal_id',
         'date',
         'time_slot',
         'service_type',

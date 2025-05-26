@@ -13,6 +13,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/book-a-service/{id}', [ChurchController::class, 'findChurch']);
 
     Route::post('book-baptism', [BookingController::class, 'baptismBook']);
+    Route::post('book-wedding', [BookingController::class, 'weddingBook']);
 
 
 
