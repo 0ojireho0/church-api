@@ -11,8 +11,9 @@ class BookingController extends Controller
 {
     //
 
-    public function bookAvailable(){
+    public function bookAvailable($id){
         $bookedSlots = DB::table('bookings')
+                        ->where('church_id', $id)
                         ->get()
                         ->groupBy('date')
                         ->map(function ($group){
@@ -21,6 +22,7 @@ class BookingController extends Controller
                         ->toArray();
 
         $fullyBook = DB::table('fully_books')
+                        ->where('church_id', $id)
                         ->pluck('date');
 
         return response()->json([
@@ -42,7 +44,8 @@ class BookingController extends Controller
 
         if($fullyBook){
             FullyBook::create([
-                'date' => $fullyBook
+                'date' => $fullyBook,
+                'church_id' => $church_id
             ]);
         }
 
@@ -89,13 +92,15 @@ class BookingController extends Controller
 
         if($rehearsalFullyBooked){
             FullyBook::create([
-                'date' => $rehearsalFullyBooked
+                'date' => $rehearsalFullyBooked,
+                'church_id' => $church_id
             ]);
         }
 
         if($weddingFullyBooked){
             FullyBook::create([
-                'date' => $weddingFullyBooked
+                'date' => $weddingFullyBooked,
+                'church_id' => $church_id
             ]);
         }
 
@@ -141,4 +146,94 @@ class BookingController extends Controller
 
         return response()->json(200);
     }
+
+    public function memorialBook(Request $request){
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $user_id = $request->user['id'];
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+
+        if($fullyBook){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+
+            $result = Booking::create([
+                'user_id' => $user_id,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'service_type' => 'memorial',
+                'filename' => null,
+                'filepath' => null,
+                'mop' => $mop,
+                'status' => 'Pending',
+                'form_data' => $form_data
+            ]);
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+
+
+        return response()->json([
+            'result' => $result
+        ], 200);
+
+
+    }
+
+    public function confirmationBook(Request $request){
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $user_id = $request->user['id'];
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+
+        if($fullyBook){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+
+            $result = Booking::create([
+                'user_id' => $user_id,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'service_type' => 'confirmation',
+                'filename' => null,
+                'filepath' => null,
+                'mop' => $mop,
+                'status' => 'Pending',
+                'form_data' => $form_data
+            ]);
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+
+
+        return response()->json([
+            'result' => $result
+        ], 200);
+    }
+
+
 }

@@ -9,6 +9,7 @@ class FullyBook extends Model
     //
 
     protected $fillable = [
-        'date'
+        'date',
+        'church_id'
     ];
 }

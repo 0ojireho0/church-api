@@ -14,8 +14,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
 
     Route::post('book-baptism', [BookingController::class, 'baptismBook']);
     Route::post('book-wedding', [BookingController::class, 'weddingBook']);
+    Route::post('book-memorial', [BookingController::class, 'memorialBook']);
+    Route::post('book-confirmation', [BookingController::class, 'confirmationBook']);
 
 
 
 });
-Route::get('book-available', [BookingController::class, 'bookAvailable']);
+Route::get('book-available/{id}', [BookingController::class, 'bookAvailable']);

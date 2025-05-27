@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('fully_books', function (Blueprint $table) {
             $table->id();
             $table->date('date')->nullable();
+            $table->bigInteger('church_id')->nullable();
             $table->timestamps();
         });
     }
