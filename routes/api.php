@@ -16,6 +16,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('book-wedding', [BookingController::class, 'weddingBook']);
     Route::post('book-memorial', [BookingController::class, 'memorialBook']);
     Route::post('book-confirmation', [BookingController::class, 'confirmationBook']);
+    Route::post('book-mass', [BookingController::class, 'massBook']);
 
 
 

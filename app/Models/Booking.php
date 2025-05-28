@@ -12,6 +12,7 @@ class Booking extends Model
         'user_id',
         'church_id',
         'wedding_rehearsal_id',
+        'reference_num',
         'date',
         'time_slot',
         'service_type',

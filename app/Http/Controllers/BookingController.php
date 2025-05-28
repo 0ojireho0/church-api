@@ -7,6 +7,8 @@ use App\Models\Booking;
 use App\Models\FullyBook;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\SendingEmail;
+
 class BookingController extends Controller
 {
     //
@@ -54,6 +56,7 @@ class BookingController extends Controller
             $result = Booking::create([
                 'user_id' => $user_id,
                 'church_id' => $church_id,
+                'reference_num' => strtotime("now"),
                 'date' => $dateBook,
                 'time_slot' => $time_slot,
                 'service_type' => 'baptism',
@@ -71,8 +74,10 @@ class BookingController extends Controller
 
 
 
+
         return response()->json([
-            'result' => $result
+            'result' => $result,
+            'ref_num' => $result->reference_num
         ], 200);
     }
 
@@ -111,6 +116,7 @@ class BookingController extends Controller
                 'user_id' => $user_id,
                 'church_id' => $church_id,
                 'date' => $wedding_date,
+                'reference_num' => strtotime("now"),
                 'time_slot' => $wedding_time,
                 'service_type' => 'wedding',
                 'filename' => null,
@@ -126,6 +132,7 @@ class BookingController extends Controller
                 'user_id' => $user_id,
                 'wedding_rehearsal_id' => $wedding->id,
                 'church_id' => $church_id,
+                'reference_num' => $wedding->reference_num,
                 'date' => $rehearsal_date,
                 'time_slot' => $rehearsal_time,
                 'service_type' => 'wedding - rehearsal',
@@ -144,7 +151,10 @@ class BookingController extends Controller
 
 
 
-        return response()->json(200);
+        return response()->json([
+            'result' => $wedding,
+            'ref_num' => $wedding->reference_num
+        ], 200);
     }
 
     public function memorialBook(Request $request){
@@ -169,6 +179,7 @@ class BookingController extends Controller
                 'user_id' => $user_id,
                 'church_id' => $church_id,
                 'date' => $dateBook,
+                'reference_num' => strtotime('now'),
                 'time_slot' => $time_slot,
                 'service_type' => 'memorial',
                 'filename' => null,
@@ -186,7 +197,8 @@ class BookingController extends Controller
 
 
         return response()->json([
-            'result' => $result
+            'result' => $result,
+            'ref_num' => $result->reference_num
         ], 200);
 
 
@@ -214,6 +226,7 @@ class BookingController extends Controller
                 'user_id' => $user_id,
                 'church_id' => $church_id,
                 'date' => $dateBook,
+                'reference_num' => strtotime('now'),
                 'time_slot' => $time_slot,
                 'service_type' => 'confirmation',
                 'filename' => null,
@@ -231,9 +244,96 @@ class BookingController extends Controller
 
 
         return response()->json([
-            'result' => $result
+            'result' => $result,
+            'ref_num' => $result->reference_num
         ], 200);
     }
 
+    public function massBook(Request $request){
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $user_id = $request->user['id'];
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+
+
+        if($fullyBook){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+
+            $result = Booking::create([
+                'user_id' => $user_id,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'reference_num' => strtotime('now'),
+                'service_type' => 'mass',
+                'filename' => null,
+                'filepath' => null,
+                'mop' => $mop,
+                'status' => 'Pending',
+                'form_data' => $form_data
+            ]);
+
+            if($result){
+                $this->sendRefNoClient($result->reference_num);
+                $this->sendEmail($result->reference_num);
+            }
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+
+
+        return response()->json([
+            'result' => $result,
+            'ref_num' => $result->reference_num
+        ], 200);
+    }
+
+    public function sendRefNoClient($ref_no){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $message = 'This is your reference number: ' . $ref_no ;
+
+        $parameters = array(
+            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'provider' => "SIMNETWORK2",
+            'number' => "+639398971380",
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
+    }
+
+    public function sendEmail($ref_no){
+        $email = 'jeremiahquintano16@gmail.com';
+        $body =
+
+        '<p style="font-weight:normal;">
+
+                This is your reference no: ' . $ref_no . '
+
+            </p>';
+        $emailer = new SendingEmail(email: $email, body: $body, subject: 'CHURCHCONNECT - BOOK');
+
+        $emailer->send();
+
+        return true;
+    }
 
 }
