@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\FullyBook;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Church;
 
 use App\Services\SendingEmail;
 
@@ -44,6 +47,8 @@ class BookingController extends Controller
         $church_id = $request->church_id;
 
 
+
+
         if($fullyBook){
             FullyBook::create([
                 'date' => $fullyBook,
@@ -66,7 +71,11 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data
             ]);
-            $this->sendRefNoClient($result->reference_num);
+
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
+
+            $this->sendRefNoClient($result->reference_num, $user->name, $result->service_type, $result->date, $result->time_slot, $church->church_name);
             $this->sendEmail($result->reference_num);
 
         } catch (\Throwable $th) {
@@ -144,7 +153,10 @@ class BookingController extends Controller
                 'form_data' => $form_data
             ]);
 
-            $this->sendRefNoClient($wedding->reference_num);
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
+
+            $this->sendRefNoClient($wedding->reference_num, $user->name, ucfirst($wedding->service_type), $wedding->date, $wedding->time_slot, $church->church_name);
             $this->sendEmail($wedding->reference_num);
 
 
@@ -193,7 +205,10 @@ class BookingController extends Controller
                 'form_data' => $form_data
             ]);
 
-            $this->sendRefNoClient($result->reference_num);
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
+
+            $this->sendRefNoClient($result->reference_num, $user->name, ucfirst($result->service_type), $result->date, $result->time_slot, $church->church_name);
             $this->sendEmail($result->reference_num);
 
 
@@ -242,7 +257,11 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data
             ]);
-            $this->sendRefNoClient($result->reference_num);
+
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
+
+            $this->sendRefNoClient($result->reference_num, $user->name, ucfirst($result->service_type), $result->date, $result->time_slot, $church->church_name);
             $this->sendEmail($result->reference_num);
 
 
@@ -292,8 +311,10 @@ class BookingController extends Controller
                 'form_data' => $form_data
             ]);
 
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
 
-            $this->sendRefNoClient($result->reference_num);
+            $this->sendRefNoClient($result->reference_num, $user->name, ucfirst($result->service_type), $result->date, $result->time_slot, $church->church_name);
             $this->sendEmail($result->reference_num);
 
 
@@ -310,10 +331,14 @@ class BookingController extends Controller
         ], 200);
     }
 
-    public function sendRefNoClient($ref_no){
+    public function sendRefNoClient($ref_no, $username, $service_type, $date, $timeslot, $churchname){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
 
-        $message = 'This is your reference number: ' . $ref_no ;
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('F j, Y');
+        $formattedTime = Carbon::createFromFormat('H:i:s', $timeslot)->format('g:iA');
+        $firstUpperLtr = ucfirst(trim($service_type));
+
+        $message = "Dear $username, your booking via ChurchConnect is confirmed.\n\nReference #: $ref_no for $firstUpperLtr on {$formattedDate} {$formattedTime} at $churchname\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
