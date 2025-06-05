@@ -66,7 +66,8 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data
             ]);
-
+            $this->sendRefNoClient($result->reference_num);
+            $this->sendEmail($result->reference_num);
 
         } catch (\Throwable $th) {
             throw $th;
@@ -143,6 +144,9 @@ class BookingController extends Controller
                 'form_data' => $form_data
             ]);
 
+            $this->sendRefNoClient($wedding->reference_num);
+            $this->sendEmail($wedding->reference_num);
+
 
         } catch (\Throwable $th) {
             throw $th;
@@ -188,6 +192,9 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data
             ]);
+
+            $this->sendRefNoClient($result->reference_num);
+            $this->sendEmail($result->reference_num);
 
 
         } catch (\Throwable $th) {
@@ -235,6 +242,9 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data
             ]);
+            $this->sendRefNoClient($result->reference_num);
+            $this->sendEmail($result->reference_num);
+
 
 
         } catch (\Throwable $th) {
@@ -282,10 +292,10 @@ class BookingController extends Controller
                 'form_data' => $form_data
             ]);
 
-            if($result){
-                $this->sendRefNoClient($result->reference_num);
-                $this->sendEmail($result->reference_num);
-            }
+
+            $this->sendRefNoClient($result->reference_num);
+            $this->sendEmail($result->reference_num);
+
 
 
         } catch (\Throwable $th) {
@@ -296,7 +306,7 @@ class BookingController extends Controller
 
         return response()->json([
             'result' => $result,
-            'ref_num' => $result->reference_num
+            'ref_num' => $result->reference_num,
         ], 200);
     }
 
