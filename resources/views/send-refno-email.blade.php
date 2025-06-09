@@ -9,7 +9,6 @@
 <body>
 
     <p>Dear <b>{{ $username }}</b></p>,
-    <br />
     <p>Thank you for booking through ChurchConnect. Your request has been successfully received.</p>
     <br />
     <p>Here are your booking details: </p><br />
