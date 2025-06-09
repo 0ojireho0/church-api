@@ -69,7 +69,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -133,7 +134,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
 
@@ -150,7 +152,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -202,7 +205,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -255,7 +259,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -308,7 +313,8 @@ class BookingController extends Controller
                 'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
-                'form_data' => $form_data
+                'form_data' => $form_data,
+                'book_type' => 'schedule'
             ]);
 
             $user = User::findOrFail($user_id);

@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Church;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
-    //
-
     protected $fillable = [
         'user_id',
         'church_id',
@@ -20,10 +21,22 @@ class Booking extends Model
         'form_data',
         'filename',
         'filepath',
-        'mop'
+        'mop',
+        'book_type'
     ];
 
     protected $casts = [
-        'form_data' => 'array'
+        'form_data' => 'array',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function church(): BelongsTo
+    {
+        return $this->belongsTo(Church::class);
+    }
+
+
 }

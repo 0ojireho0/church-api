@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuth\RegisteredAdminController;
 use App\Http\Controllers\AdminAuth\AuthenticatedSessionController;
+use App\Http\Controllers\SearchServiceController;
 use Illuminate\Http\Request;
 
 Route::post('/register-admin', [RegisteredAdminController::class, 'store']);
@@ -14,4 +15,6 @@ Route::middleware(['auth:admin'])->group(function(){
     });
 
     Route::post('/logout-admin', [AuthenticatedSessionController::class, 'destroy']);
+
+    Route::get('/search-service/{searchStatus}', [SearchServiceController::class, 'searchService']);
 });
