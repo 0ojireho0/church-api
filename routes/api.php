@@ -23,5 +23,4 @@ Route::middleware(['auth:sanctum'])->group(function(){
 });
 
 Route::get('try-email', [BookingController::class, 'sendEmail']);
-// Route::get('try-sms', [BookingController::class, 'sendRefNoClient']);
 Route::get('book-available/{id}', [BookingController::class, 'bookAvailable']);
