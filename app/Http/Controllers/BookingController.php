@@ -70,7 +70,8 @@ class BookingController extends Controller
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -135,7 +136,8 @@ class BookingController extends Controller
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
 
@@ -153,7 +155,8 @@ class BookingController extends Controller
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -206,7 +209,8 @@ class BookingController extends Controller
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -260,7 +264,8 @@ class BookingController extends Controller
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
             $user = User::findOrFail($user_id);
@@ -314,7 +319,8 @@ class BookingController extends Controller
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
-                'book_type' => 'schedule'
+                'book_type' => 'schedule',
+                'mop_status' => 'Not Paid'
             ]);
 
             $user = User::findOrFail($user_id);

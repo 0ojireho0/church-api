@@ -18,10 +18,12 @@ class Booking extends Model
         'time_slot',
         'service_type',
         'status',
+        'set_status',
         'form_data',
         'filename',
         'filepath',
         'mop',
+        'mop_status',
         'book_type'
     ];
 

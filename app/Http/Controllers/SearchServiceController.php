@@ -44,4 +44,28 @@ class SearchServiceController extends Controller
 
 
     }
+
+    public function changeStatus(Request $request){
+        $id = $request->id;
+        $status = $request->selectedStatus;
+
+        $result = Booking::findOrFail($id);
+        $mop_status = "";
+
+        if($status == "Approved"){
+            $mop_status = "Paid";
+        }else{
+            $mop_status = "Not Paid";
+        }
+
+        $result->update([
+            'status' => $status,
+            'mop_status' => $mop_status,
+            'set_status' => 1
+        ]);
+
+        return response()->json([
+            'result' => $result
+        ], 200);
+    }
 }
