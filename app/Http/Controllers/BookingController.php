@@ -388,4 +388,15 @@ class BookingController extends Controller
         return true;
     }
 
+
+    public function myBooks($user_id){
+
+        $result = Booking::where('user_id', $user_id)
+                            ->whereNull('wedding_rehearsal_id')
+                            ->get();
+
+        return $result;
+
+    }
+
 }
