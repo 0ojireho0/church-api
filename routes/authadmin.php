@@ -18,4 +18,8 @@ Route::middleware(['auth:admin'])->group(function(){
 
     Route::get('/search-service/{searchStatus}/{church_id}', [SearchServiceController::class, 'searchService']);
     Route::post('/changeStatus', [SearchServiceController::class, 'changeStatus']);
+
+    Route::get('all-admin', [SearchServiceController::class, 'allAdmin']);
+
+    Route::delete('delete-admin', [SearchServiceController::class, 'deleteAdmin']);
 });

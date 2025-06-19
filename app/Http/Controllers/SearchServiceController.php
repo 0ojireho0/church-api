@@ -19,6 +19,53 @@ class SearchServiceController extends Controller
 
         $service_types = ['baptism', 'wedding', 'memorial', 'confirmation', 'mass', 'certificate'];
 
+
+        if((int)$church_id === 0){
+            switch((int)$searchStatus){
+                case 0:
+                    $result = Booking::with('user', 'church')
+                                        ->whereIn('service_type', $service_types)
+                                        ->orderBy('id', 'desc')
+                                        ->get();
+                    break;
+                case 1:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'baptism')
+                                        ->get();
+                    break;
+                case 2:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'wedding')
+                                        ->get();
+                    break;
+                case 3:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'memorial')
+                                        ->get();
+                    break;
+                case 4:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'confirmation')
+                                        ->get();
+                    break;
+                case 5:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'mass')
+                                        ->get();
+                    break;
+                case 6:
+                    $result = Booking::with('user', 'church')
+                                        ->where('service_type', 'certificate')
+                                        ->get();
+                    break;
+
+                default:
+                    $result = [];
+                    break;
+            }
+            return $result;
+        }
+
         switch((int)$searchStatus){
             case 0:
                 $result = Booking::with('user', 'church')
@@ -292,6 +339,26 @@ class SearchServiceController extends Controller
         // Receive response from server
         $output = curl_exec($ch);
         curl_close($ch);
+    }
+
+    public function allAdmin(){
+        return Admin::with('church')->where('admin_type', 'Admin')->get();
+    }
+
+    public function deleteAdmin(Request $request){
+        $request->validate([
+            'id' => 'required|exists:admins,id',
+        ]);
+
+        $admin = Admin::find($request->id);
+
+        if (!$admin) {
+            return response()->json(['message' => 'Admin not found.'], 404);
+        }
+
+        $admin->delete();
+
+        return response()->json(['message' => 'Admin deleted successfully.']);
     }
 
 }
