@@ -8,24 +8,15 @@
 </head>
 <body>
 
-    <p>Dear <b>{{ $username }}</b>,</p>
-    <p>Thank you for booking through ChurchConnect. Your request has been successfully received.</p>
-    <br />
-    <p>Here are your booking details: </p><br />
+    <p>Dear <b>{{ $username }}</b></p>
+    <p>Thank you for booking through ChurchConnect has been <b>Approved</b></p>
+    <p>Here are your booking details: </p>
     <ul>
         <li>Type of Service: <b>{{ $service_type }}</b> </li>
         <li>Reference Number: <b>{{ $ref_no }}</b> </li>
         <li>Date & Time: <b>{{ $date }} {{ $timeslot }}</b> </li>
         <li>Location: <b>{{ $churchname }}</b> </li>
     </ul>
-
-    <br />
-
-    <p>Please keep this reference number for any future updates or inquiries related to your booking.</p>
-
-    <br />
-
-    <p>If you have any questions, feel free to reply this message (churchconnect@gmail.com) or contact our support team.</p>
 
     <br />
 

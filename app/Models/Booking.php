@@ -24,7 +24,8 @@ class Booking extends Model
         'filepath',
         'mop',
         'mop_status',
-        'book_type'
+        'book_type',
+        'remarks'
     ];
 
     protected $casts = [

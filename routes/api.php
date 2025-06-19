@@ -9,7 +9,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::get('/get-church', [ChurchController::class, 'index']);
+
     Route::get('/book-a-service/{id}', [ChurchController::class, 'findChurch']);
 
     Route::post('book-baptism', [BookingController::class, 'baptismBook']);
@@ -17,11 +17,13 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('book-memorial', [BookingController::class, 'memorialBook']);
     Route::post('book-confirmation', [BookingController::class, 'confirmationBook']);
     Route::post('book-mass', [BookingController::class, 'massBook']);
+    Route::post('request-certificate', [BookingController::class, 'requestCertificate']);
 
     Route::get('my-booking/{user_id}', [BookingController::class, 'myBooks']);
 
 
 });
 
+Route::get('/get-church', [ChurchController::class, 'index']);
 Route::get('try-email', [BookingController::class, 'sendEmail']);
 Route::get('book-available/{id}', [BookingController::class, 'bookAvailable']);

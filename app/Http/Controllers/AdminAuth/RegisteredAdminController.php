@@ -25,7 +25,8 @@ class RegisteredAdminController extends Controller
             'fullname' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
-            'username' => $request->username
+            'username' => $request->username,
+            'church_id' => $request->church_id
         ]);
 
         // event(new Registered($user));

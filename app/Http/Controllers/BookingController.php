@@ -343,6 +343,49 @@ class BookingController extends Controller
         ], 200);
     }
 
+    public function requestCertificate(Request $request){
+        $form_data = json_decode($request->jsonData);
+        $mop = $request->selectedPayment;
+        $user_id = $request->user['id'];
+        $church_id = $request->id;
+
+
+        try {
+
+            $result = Booking::create([
+                'user_id' => $user_id,
+                'church_id' => $church_id,
+                'service_type' => 'certificate',
+                'reference_num' => strtotime('now'),
+                'mop' => $mop,
+                'status' => 'Pending',
+                'form_data' => $form_data,
+                'book_type' => 'certificate',
+                'mop_status' => 'Not Paid'
+            ]);
+
+            // $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
+
+            $this->sendRequestCertEmail($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['email']);
+
+            $this->sendRequestCertContact($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['contact']);
+
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+
+
+        return response()->json([
+            'result' => $result,
+            'ref_num' => $result->reference_num,
+        ], 200);
+
+    }
+
     public function sendRefNoClient($ref_no, $username, $service_type, $date, $timeslot, $churchname, $contact){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
 
@@ -388,6 +431,48 @@ class BookingController extends Controller
         return true;
     }
 
+    public function sendRequestCertEmail($fullname, $cert_type, $created_at, $churchname, $ref_no, $email){
+
+        $formattedDate = Carbon::parse($created_at)
+            ->setTimezone('Asia/Manila')
+            ->format('F d, Y h:ia');
+
+        $body = view('send-request-cert', [
+            'fullname' => $fullname,
+            'cert_type' => $cert_type,
+            'created_at' => $formattedDate,
+            'churchname' => $churchname,
+            'ref_no' => $ref_no,
+        ]);
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "Certificate Request Received – $churchname ");
+
+        $emailer->send();
+
+        return true;
+    }
+
+    public function sendRequestCertContact($fullname, $cert_type, $created_at, $churchname, $ref_no, $contact){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $certList = implode(', ', $cert_type);
+        $message ="Dear $fullname,\n\nYour request for a $certList at $churchname via ChurchConnect has been received and is under review.\n\nReference #: $ref_no\n\nYou will be notified once processing is complete.\n\nKind Regards,\nChurchConnect Team";
+
+
+        $parameters = array(
+            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'provider' => "SIMNETWORK2",
+            'number' => $contact,
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
+    }
+
 
     public function myBooks($user_id){
 
@@ -398,5 +483,7 @@ class BookingController extends Controller
         return $result;
 
     }
+
+
 
 }

@@ -11,11 +11,11 @@ Route::post('/login-admin', [AuthenticatedSessionController::class, 'store']);
 
 Route::middleware(['auth:admin'])->group(function(){
     Route::get('/user-admin', function(Request $request){
-        return $request->user();
+        return $request->user()->load('church');
     });
 
     Route::post('/logout-admin', [AuthenticatedSessionController::class, 'destroy']);
 
-    Route::get('/search-service/{searchStatus}', [SearchServiceController::class, 'searchService']);
+    Route::get('/search-service/{searchStatus}/{church_id}', [SearchServiceController::class, 'searchService']);
     Route::post('/changeStatus', [SearchServiceController::class, 'changeStatus']);
 });
