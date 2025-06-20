@@ -361,4 +361,24 @@ class SearchServiceController extends Controller
         return response()->json(['message' => 'Admin deleted successfully.']);
     }
 
+    public function updateAdmin(Request $request){
+        // Validate incoming data
+        $validated = $request->validate([
+            'id' => 'required|exists:admins,id',
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:admins,email,' . $request->id,
+        ]);
+
+        // Find and update the admin
+        $admin = Admin::findOrFail($validated['id']);
+        $admin->fullname = $validated['fullname'];
+        $admin->email = $validated['email'];
+        $admin->save();
+
+        return response()->json([
+            'message' => 'Admin updated successfully.',
+            'admin' => $admin
+        ], 200);
+    }
+
 }

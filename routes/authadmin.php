@@ -22,4 +22,5 @@ Route::middleware(['auth:admin'])->group(function(){
     Route::get('all-admin', [SearchServiceController::class, 'allAdmin']);
 
     Route::delete('delete-admin', [SearchServiceController::class, 'deleteAdmin']);
+    Route::put('update-admin', [SearchServiceController::class, 'updateAdmin']);
 });
