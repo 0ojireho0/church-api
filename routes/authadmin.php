@@ -17,6 +17,7 @@ Route::middleware(['auth:admin'])->group(function(){
     Route::post('/logout-admin', [AuthenticatedSessionController::class, 'destroy']);
 
     Route::get('/search-service/{searchStatus}/{church_id}', [SearchServiceController::class, 'searchService']);
+    Route::get('/show-all-book/{church_id}', [SearchServiceController::class, 'showAllBook']);
     Route::post('/changeStatus', [SearchServiceController::class, 'changeStatus']);
 
     Route::get('all-admin', [SearchServiceController::class, 'allAdmin']);

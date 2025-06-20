@@ -121,6 +121,28 @@ class SearchServiceController extends Controller
 
     }
 
+    public function showAllBook($church_id){
+        $result = [];
+
+        $service_types = ['baptism', 'wedding', 'memorial', 'confirmation', 'mass', 'certificate'];
+
+
+        if((int)$church_id === 0){
+            $result = Booking::with('user', 'church')
+                                ->whereIn('service_type', $service_types)
+                                ->orderBy('id', 'desc')
+                                ->get();
+            return $result;
+        }
+
+        $result = Booking::with('user', 'church')
+                            ->where('church_id', $church_id)
+                            ->whereIn('service_type', $service_types)
+                            ->orderBy('id', 'desc')
+                            ->get();
+        return $result;
+    }
+
     public function changeStatus(Request $request){
         $id = $request->id;
         $status = $request->selectedStatus;
