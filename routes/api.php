@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatController;
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user', function (Request $request) {
@@ -20,6 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('request-certificate', [BookingController::class, 'requestCertificate']);
 
     Route::get('my-booking/{user_id}', [BookingController::class, 'myBooks']);
+
+    Route::post('/chatbot', [ChatController::class, 'processMessage']);
 
 
 });

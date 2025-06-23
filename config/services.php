@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'wit_ai' => [
+        'base_url' => 'https://api.wit.ai',
+        'version' => '20241122',
+        'access_token' => env('WIT_AI_SERVER_ACCESS_TOKEN'),
+    ],
 
 ];

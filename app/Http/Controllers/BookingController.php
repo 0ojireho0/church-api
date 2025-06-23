@@ -397,7 +397,7 @@ class BookingController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK2",
+            'provider' => "SIMNETWORK",
             'number' => $contact,
             'content' => $message,
           );
@@ -460,7 +460,7 @@ class BookingController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK2",
+            'provider' => "SIMNETWORK",
             'number' => $contact,
             'content' => $message,
           );

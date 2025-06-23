@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+use App\Notifications\CustomResetPassword;
+
 class PasswordResetLinkController extends Controller
 {
     /**
@@ -35,5 +39,32 @@ class PasswordResetLinkController extends Controller
         }
 
         return response()->json(['status' => __($status)]);
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email', // adjust table if needed
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Invalid email',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Get the user
+        $user = User::where('email', $request->email)->first();
+
+        // Generate token
+        $token = Password::createToken($user);
+
+        $notification = new CustomResetPassword($token);
+        $notification->sendCustomEmail($user);
+
+        return response()->json([
+            'message' => 'Password reset link sent!'
+        ]);
     }
 }
