@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Models\Church;
 
 use App\Services\SendingEmail;
+use App\Models\FileUpload;
+use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
@@ -42,19 +44,22 @@ class BookingController extends Controller
         $dateBook = $request->date;
         $time_slot = $request->selectedTime;
         $mop = $request->selectedPayment;
-        $user_id = $request->user['id'];
+        $user_id = $request->user_id;
         $fullyBook = $request->fullyBooked;
         $church_id = $request->church_id;
 
 
 
 
-        if($fullyBook){
+
+
+        if($fullyBook !== "null"){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
             ]);
         }
+
 
         try {
 
@@ -65,14 +70,29 @@ class BookingController extends Controller
                 'date' => $dateBook,
                 'time_slot' => $time_slot,
                 'service_type' => 'baptism',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
                 'mop_status' => 'Not Paid'
             ]);
+
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $result->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $result->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $result->reference_num . '/' . $filename
+                    ]);
+                }
+            }
 
             $user = User::findOrFail($user_id);
             $church = Church::findOrFail($church_id);
@@ -95,6 +115,8 @@ class BookingController extends Controller
 
     public function weddingBook(Request $request){
 
+        // return $request;
+
         $church_id = $request->church_id;
         $form_data = json_decode($request->jsonData);
         $rehearsalFullyBooked = $request->rehearsalFullyBooked;
@@ -104,17 +126,17 @@ class BookingController extends Controller
         $weddingFullyBooked = $request->weddingFullyBooked;
         $wedding_date = $request->wedding_date;
         $wedding_time = $request->wedding_time;
-        $user_id = $request->user['id'];
+        $user_id = $request->user_id;
 
 
-        if($rehearsalFullyBooked){
+        if($rehearsalFullyBooked !== "null"){
             FullyBook::create([
                 'date' => $rehearsalFullyBooked,
                 'church_id' => $church_id
             ]);
         }
 
-        if($weddingFullyBooked){
+        if($weddingFullyBooked !== "null"){
             FullyBook::create([
                 'date' => $weddingFullyBooked,
                 'church_id' => $church_id
@@ -131,8 +153,6 @@ class BookingController extends Controller
                 'reference_num' => strtotime("now"),
                 'time_slot' => $wedding_time,
                 'service_type' => 'wedding',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
                 'form_data' => $form_data,
@@ -149,15 +169,29 @@ class BookingController extends Controller
                 'reference_num' => $wedding->reference_num,
                 'date' => $rehearsal_date,
                 'time_slot' => $rehearsal_time,
-                'service_type' => 'wedding - rehearsal',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $selectedPayment,
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
                 'mop_status' => 'Not Paid'
             ]);
+
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $wedding->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $wedding->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $wedding->reference_num . '/' . $filename
+                    ]);
+                }
+            }
 
             $user = User::findOrFail($user_id);
             $church = Church::findOrFail($church_id);
@@ -180,15 +214,18 @@ class BookingController extends Controller
     }
 
     public function memorialBook(Request $request){
+
+
+
         $form_data = json_decode($request->jsonData);
         $dateBook = $request->date;
         $time_slot = $request->selectedTime;
         $mop = $request->selectedPayment;
-        $user_id = $request->user['id'];
+        $user_id = $request->user_id;
         $fullyBook = $request->fullyBooked;
         $church_id = $request->church_id;
 
-        if($fullyBook){
+        if($fullyBook !== "null"){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -204,14 +241,29 @@ class BookingController extends Controller
                 'reference_num' => strtotime('now'),
                 'time_slot' => $time_slot,
                 'service_type' => 'memorial',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
                 'mop_status' => 'Not Paid'
             ]);
+
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $result->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $result->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $result->reference_num . '/' . $filename
+                    ]);
+                }
+            }
 
             $user = User::findOrFail($user_id);
             $church = Church::findOrFail($church_id);
@@ -235,15 +287,16 @@ class BookingController extends Controller
     }
 
     public function confirmationBook(Request $request){
+
         $form_data = json_decode($request->jsonData);
         $dateBook = $request->date;
         $time_slot = $request->selectedTime;
         $mop = $request->selectedPayment;
-        $user_id = $request->user['id'];
+        $user_id = $request->user_id;
         $fullyBook = $request->fullyBooked;
         $church_id = $request->church_id;
 
-        if($fullyBook){
+        if($fullyBook !== "null"){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -259,14 +312,29 @@ class BookingController extends Controller
                 'reference_num' => strtotime('now'),
                 'time_slot' => $time_slot,
                 'service_type' => 'confirmation',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
                 'mop_status' => 'Not Paid'
             ]);
+
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $result->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $result->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $result->reference_num . '/' . $filename
+                    ]);
+                }
+            }
 
             $user = User::findOrFail($user_id);
             $church = Church::findOrFail($church_id);
@@ -289,16 +357,17 @@ class BookingController extends Controller
     }
 
     public function massBook(Request $request){
+
         $form_data = json_decode($request->jsonData);
         $dateBook = $request->date;
         $time_slot = $request->selectedTime;
         $mop = $request->selectedPayment;
-        $user_id = $request->user['id'];
+        $user_id = $request->user_id;
         $fullyBook = $request->fullyBooked;
         $church_id = $request->church_id;
 
 
-        if($fullyBook){
+        if($fullyBook !== "null"){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -314,14 +383,29 @@ class BookingController extends Controller
                 'time_slot' => $time_slot,
                 'reference_num' => strtotime('now'),
                 'service_type' => 'mass',
-                'filename' => null,
-                'filepath' => null,
                 'mop' => $mop,
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
                 'mop_status' => 'Not Paid'
             ]);
+
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $result->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $result->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $result->reference_num . '/' . $filename
+                    ]);
+                }
+            }
 
             $user = User::findOrFail($user_id);
             $church = Church::findOrFail($church_id);

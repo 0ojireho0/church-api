@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Church;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\FileUpload;
 
 class Booking extends Model
 {
@@ -39,6 +40,11 @@ class Booking extends Model
     public function church(): BelongsTo
     {
         return $this->belongsTo(Church::class);
+    }
+
+    public function files()
+    {
+        return $this->hasMany(FileUpload::class, 'book_id');
     }
 
 

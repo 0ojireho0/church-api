@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Admin;
 use Carbon\Carbon;
 use App\Services\SendingEmail;
+use App\Models\FileUpload;
 
 
 class SearchServiceController extends Controller
@@ -23,38 +24,40 @@ class SearchServiceController extends Controller
         if((int)$church_id === 0){
             switch((int)$searchStatus){
                 case 0:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->whereIn('service_type', $service_types)
                                         ->orderBy('id', 'desc')
                                         ->get();
+
+
                     break;
                 case 1:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'baptism')
                                         ->get();
                     break;
                 case 2:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'wedding')
                                         ->get();
                     break;
                 case 3:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'memorial')
                                         ->get();
                     break;
                 case 4:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'confirmation')
                                         ->get();
                     break;
                 case 5:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'mass')
                                         ->get();
                     break;
                 case 6:
-                    $result = Booking::with('user', 'church')
+                    $result = Booking::with('user', 'church', 'files')
                                         ->where('service_type', 'certificate')
                                         ->get();
                     break;
@@ -68,20 +71,20 @@ class SearchServiceController extends Controller
 
         switch((int)$searchStatus){
             case 0:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->whereIn('service_type', $service_types)
                                     ->orderBy('id', 'desc')
                                     ->get();
                 break;
             case 1:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->where('service_type', 'baptism')
                                     ->get();
                 break;
             case 2:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->where('service_type', 'wedding')
                                     ->get();
@@ -93,19 +96,19 @@ class SearchServiceController extends Controller
                                     ->get();
                 break;
             case 4:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->where('service_type', 'confirmation')
                                     ->get();
                 break;
             case 5:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->where('service_type', 'mass')
                                     ->get();
                 break;
             case 6:
-                $result = Booking::with('user', 'church')
+                $result = Booking::with('user', 'church', 'files')
                                     ->where('church_id', $church_id)
                                     ->where('service_type', 'certificate')
                                     ->get();

@@ -60,6 +60,21 @@ return [
             'report' => false,
         ],
 
+        'llibiapp_dms' => [
+            'driver' => 's3',
+            'key' => env('DO_LLIBI_ACCESS_KEY_ID_DMS'),
+            'secret' => env('DO_LLIBI_SECRET_ACCESS_KEY_DMS'),
+            'region' => env('DO_LLIBI_DEFAULT_REGION_DMS'),
+            'bucket' => env('DO_LLIBI_BUCKET_DMS'),
+            'cdn_endpoint' => env('DO_LLIBI_CDN_ENDPOINT_DMS'),
+            'url' => env('DO_LLIBI_URL_DMS'),
+            'endpoint' => env('DO_LLIBI_ENDPOINT_DMS'),
+            'bucket_endpoint' => true,
+            'use_path_style_endpoint' => env('DO_LLIBI_USE_PATH_STYLE_ENDPOINT_DMS', false),
+            'visibility' => 'public',
+            'throw' => false,
+          ],
+
     ],
 
     /*
