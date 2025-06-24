@@ -20,9 +20,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Custom admin API routes
-        Route::middleware('api')
-            ->prefix('api/admin')
+        // ✅ Use 'web' middleware to enable session support
+        Route::middleware('web')
+            ->prefix('admin') // optional: change to 'api/admin' if needed
             ->group(base_path('routes/authadmin.php'));
     }
 }
