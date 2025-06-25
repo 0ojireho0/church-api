@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\UserController;
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user', function (Request $request) {
@@ -23,6 +24,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('my-booking/{user_id}', [BookingController::class, 'myBooks']);
 
     Route::post('/chatbot', [ChatController::class, 'processMessage']);
+
+    Route::put('/edit-profile', [UserController::class, 'update']);
 
 
 });

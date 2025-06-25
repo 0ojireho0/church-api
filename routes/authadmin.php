@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuth\RegisteredAdminController;
 use App\Http\Controllers\AdminAuth\AuthenticatedSessionController;
 use App\Http\Controllers\SearchServiceController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 
 Route::post('/register-admin', [RegisteredAdminController::class, 'store']);
@@ -24,4 +25,6 @@ Route::middleware(['auth:admin'])->group(function(){
 
     Route::delete('delete-admin', [SearchServiceController::class, 'deleteAdmin']);
     Route::put('update-admin', [SearchServiceController::class, 'updateAdmin']);
+
+    Route::put('/edit-profile', [UserController::class, 'updateAdmin']);
 });
