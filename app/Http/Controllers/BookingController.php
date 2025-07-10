@@ -21,6 +21,7 @@ class BookingController extends Controller
     public function bookAvailable($id){
         $bookedSlots = DB::table('bookings')
                         ->where('church_id', $id)
+                        ->where('status', 'Approved')
                         ->get()
                         ->groupBy('date')
                         ->map(function ($group){
@@ -476,6 +477,7 @@ class BookingController extends Controller
         $findBookingId = Booking::with('user')->where('id', $booking_id)->firstOrFail();
 
         $findBookingId->status = "Cancelled";
+        $findBookingId->set_status = "1";
 
         $findBookingId->update();
 

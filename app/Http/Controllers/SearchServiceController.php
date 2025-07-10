@@ -150,16 +150,15 @@ class SearchServiceController extends Controller
         $id = $request->id;
         $status = $request->selectedStatus;
         $remarks = $request->remarks;
+        $isPaid = $request->selectedIsPaid;
 
 
         $result = Booking::with('user', 'church')->findOrFail($id);
 
 
 
-        $mop_status = "";
 
         if($status == "Approved" && $result->book_type == "schedule"){
-            $mop_status = "Paid";
             $this->sendApprovedBookContact($result->user['name'], $result->service_type, $result->reference_num, $result->date, $result->time_slot, $result->church['church_name'], $result->user['contact']);
 
             $this->sendApprovedBookEmail($result->user['name'], $result->service_type, $result->reference_num, $result->date, $result->time_slot, $result->church['church_name'], $result->user['email']);
@@ -167,15 +166,12 @@ class SearchServiceController extends Controller
         }
 
         if($status == "Rejected" && $result->book_type == "schedule"){
-            $mop_status = "Not Paid";
             $this->sendRejectedBookContact($result->user['name'], $result->service_type, $result->reference_num, $result->date, $result->time_slot, $result->church['church_name'], $result->user['contact'], $remarks);
 
             $this->sendRejectedBookEmail($result->user['name'], $result->service_type, $result->reference_num, $result->date, $result->time_slot, $result->church['church_name'], $result->user['email'], $remarks);
         }
 
         if($status == "Approved" && $result->book_type == 'certificate'){
-           $mop_status = "Paid";
-        //    return $result->form_data['services'];
 
             $this->sendApprovedCertificateEmail($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['email']);
 
@@ -184,8 +180,6 @@ class SearchServiceController extends Controller
         }
 
         if($status == "Rejected" && $result->book_type == 'certificate'){
-           $mop_status = "Not Paid";
-
            $this->sendRejectedCertificateEmail($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['email'], $remarks);
 
             $this->sendRejectedCertificateContact($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['contact'], $remarks);
@@ -195,7 +189,7 @@ class SearchServiceController extends Controller
 
         $result->update([
             'status' => $status,
-            'mop_status' => $mop_status,
+            'mop_status' => $status === "Approved" ? "Paid" : $isPaid,
             'set_status' => 1,
             'remarks' => $remarks
         ]);
