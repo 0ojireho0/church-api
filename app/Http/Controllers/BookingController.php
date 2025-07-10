@@ -470,6 +470,59 @@ class BookingController extends Controller
 
     }
 
+    public function cancelBooking(Request $request){
+        $booking_id = $request->booking_id;
+
+        $findBookingId = Booking::with('user')->where('id', $booking_id)->firstOrFail();
+
+        $findBookingId->status = "Cancelled";
+
+        $findBookingId->update();
+
+        $this->sendCancelledSms($findBookingId->user->contact, $findBookingId->reference_num);
+        $this->sendCancelledEmail($findBookingId->reference_num, $findBookingId->user->email, $findBookingId->user->name);
+
+        return $findBookingId;
+
+
+    }
+
+    public function sendCancelledSms($contact, $ref_no){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $message = 'This is to confirm that your booking has been cancelled as per your request. Your reference number is ' . $ref_no;
+
+        $parameters = array(
+            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'provider' => "SIMNETWORK",
+            'number' => $contact,
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return $output;
+    }
+
+    public function sendCancelledEmail($ref_no, $email, $username){
+
+
+        $body = view('send-cancelled-email', [
+            'username' => $username,
+            'ref_no' => $ref_no
+        ]);
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "Cancellation of Booking - Reference #$ref_no ");
+
+        $emailer->send();
+
+        return true;
+    }
+
     public function sendRefNoClient($ref_no, $username, $service_type, $date, $timeslot, $churchname, $contact){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
 

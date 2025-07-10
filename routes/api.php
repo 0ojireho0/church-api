@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('book-confirmation', [BookingController::class, 'confirmationBook']);
     Route::post('book-mass', [BookingController::class, 'massBook']);
     Route::post('request-certificate', [BookingController::class, 'requestCertificate']);
+    Route::post('cancel-booking', [BookingController::class, 'cancelBooking']);
 
     Route::get('my-booking/{user_id}', [BookingController::class, 'myBooks']);
 
