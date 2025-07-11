@@ -19,11 +19,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $redirectTo = "/dashboard";
+        $redirectTo = $request->user()->email_verified_at === null ? "/verify-email" : "/dashboard";
 
         return response()->json([
             'message' => 'Login Successfull',
-            'redirect_to' => $redirectTo
+            'redirect_to' => $redirectTo,
+            'user' => $request->user()
         ], 200);
     }
 

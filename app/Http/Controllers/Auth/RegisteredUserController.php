@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use App\Services\EmailVerificationService;
 
 class RegisteredUserController extends Controller
 {
@@ -38,7 +39,8 @@ class RegisteredUserController extends Controller
             'address' => $request->address
         ]);
 
-        event(new Registered($user));
+        // event(new Registered($user));
+        (new EmailVerificationService)->sendVerificationEmail($user);
 
         // Auth::login($user);
 
