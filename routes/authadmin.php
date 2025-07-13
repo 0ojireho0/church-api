@@ -20,6 +20,7 @@ Route::middleware(['auth:admin'])->group(function(){
 
     Route::get('/search-service/{searchStatus}/{church_id}', [SearchServiceController::class, 'searchService']);
     Route::get('/show-all-book/{church_id}', [SearchServiceController::class, 'showAllBook']);
+    Route::get('/show-all-event/{church_id}', [SearchServiceController::class, 'showAllEvent']);
     Route::post('/changeStatus', [SearchServiceController::class, 'changeStatus']);
 
     Route::get('all-admin', [SearchServiceController::class, 'allAdmin']);
@@ -34,4 +35,8 @@ Route::middleware(['auth:admin'])->group(function(){
     Route::post('walkin-wedding', [BookingController::class, 'walkinWedding']);
     Route::post('walkin-memorial', [BookingController::class, 'walkinMemorial']);
     Route::post('walkin-confirmation', [BookingController::class, 'walkinConfirmation']);
+
+
+    Route::post('select-event', [BookingController::class, 'selectEvent']);
+    Route::post('findEventAdded', [BookingController::class, 'findEventAdded']);
 });

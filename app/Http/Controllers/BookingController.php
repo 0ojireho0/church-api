@@ -640,7 +640,7 @@ class BookingController extends Controller
         $church_id = $request->church_id;
         $reserved_by = $request->reserved_by;
 
-        if($fullyBook !== "null"){
+        if($fullyBook !== null){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -684,7 +684,7 @@ class BookingController extends Controller
         $church_id = $request->church_id;
         $reserved_by = $request->reserved_by;
 
-        if($fullyBook !== "null"){
+        if($fullyBook !== null){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -729,14 +729,14 @@ class BookingController extends Controller
         $wedding_time = $request->wedding_time;
         $reserved_by = $request->reserved_by;
 
-        if($rehearsalFullyBooked !== "null"){
+        if($rehearsalFullyBooked !== null){
             FullyBook::create([
                 'date' => $rehearsalFullyBooked,
                 'church_id' => $church_id
             ]);
         }
 
-        if($weddingFullyBooked !== "null"){
+        if($weddingFullyBooked !== null){
             FullyBook::create([
                 'date' => $weddingFullyBooked,
                 'church_id' => $church_id
@@ -800,7 +800,7 @@ class BookingController extends Controller
         $church_id = $request->church_id;
         $reserved_by = $request->reserved_by;
 
-        if($fullyBook !== "null"){
+        if($fullyBook !== null){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -842,7 +842,7 @@ class BookingController extends Controller
         $church_id = $request->church_id;
         $reserved_by = $request->reserved_by;
 
-        if($fullyBook !== "null"){
+        if($fullyBook !== null){
             FullyBook::create([
                 'date' => $fullyBook,
                 'church_id' => $church_id
@@ -873,6 +873,192 @@ class BookingController extends Controller
             'result' => $result
         ]);
     }
+
+    public function selectEvent(Request $request){
+        $church_id = $request->church_id;
+        $event_name = $request->event_name;
+        $fulldates = $request->fulldates;
+
+        $allUsers = User::all();
+        $church_name = Church::where('id', $church_id)->get('church_name')->firstOrFail();
+
+        // Notify All users that the event is created
+        foreach($allUsers as $user){
+
+            $this->notifyAllUserEmail($user->email, $event_name, $fulldates, $church_name);
+            $this->notifyAllUserSms($user->contact, $event_name, $fulldates, $church_name);
+
+        }
+
+
+        foreach($fulldates as $date){
+
+            // Block all dates
+            FullyBook::create([
+                'date' => $date,
+                'church_id' => $church_id,
+                'is_event' => 1,
+                'event_name' => $event_name
+            ]);
+
+            $findApprovedBooking = Booking::where('date', $date)
+                    ->where('status', 'Approved')
+                    ->where('church_id', $church_id)
+                    ->whereNotNull('user_id')
+                    ->get();
+
+            if(count($findApprovedBooking) !== 0){
+
+                foreach($findApprovedBooking as $user){
+                    $findBookingUser = Booking::where('id', $user->id)->firstOrFail();
+
+                    $findBookingUser['status'] = "Pending";
+                    $findBookingUser['set_status'] = 2;
+                    $findBookingUser->save();
+
+                    // After update, email the user
+                    $this->notifySpecificUserEmail($findBookingUser->user->email, $findBookingUser->reference_num, $church_name->church_name, $event_name, $findBookingUser->date);
+
+                    $this->notifySpecificUserSms($findBookingUser->user->contact, $findBookingUser->reference_num, $church_name->church_name, $event_name, $findBookingUser->date);
+
+                }
+
+            }
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    public function notifyAllUserEmail($email, $event_name, $fulldates, $church_name){
+
+        $formatted = collect($fulldates)->map(function ($date) {
+            return Carbon::parse($date)->format('F d, Y');
+        });
+
+        $lastIndexOfDate = count($formatted) - 1;
+
+        $formattedDate = "From $formatted[0] to $formatted[$lastIndexOfDate]";
+
+        $body = view('notify-event-users', [
+            'event_name' => $event_name,
+            'fulldates' => $formattedDate,
+            'church_name' => $church_name->church_name
+        ]);
+
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "New Event Added");
+
+        $emailer->send();
+    }
+
+    public function notifyAllUserSms($contact, $event_name, $fulldates, $church_name){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $formatted = collect($fulldates)->map(function ($date) {
+            return Carbon::parse($date)->format('F d, Y');
+        });
+
+        $lastIndexOfDate = count($formatted) - 1;
+
+        $message = "New event added by $church_name->church_name: \"$event_name\" scheduled from $formatted[0] to $formatted[$lastIndexOfDate]. Mark your calendar!";
+
+
+        $parameters = array(
+            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'provider' => "SIMNETWORK",
+            'number' => $contact,
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return $output;
+    }
+
+    public function findEventAdded(Request $request){
+        $church_id = $request->admin['church_id'];
+
+        $getFullyBook = FullyBook::where('church_id', $church_id)
+                                ->whereNotNull('is_event')
+                                 ->get();
+
+        return $getFullyBook ;
+
+    }
+
+    public function notifySpecificUserEmail($email, $reference_no, $church, $event_name, $date){
+
+    // Format single date
+    $formattedDate = Carbon::parse($date)->format('F d, Y');
+
+    // Render Blade view to string
+    $body = view('notify-specific-user', [
+        'email' => $email,
+        'reference_no' => $reference_no,
+        'church' => $church,
+        'event_name' => $event_name,
+        'date' => $formattedDate,
+    ]);
+
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "Overlapped Booking");
+
+        $emailer->send();
+    }
+
+    public function notifySpecificUserSms($contact, $reference_no, $church, $event_name, $fulldates)
+    {
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $formatted = collect($fulldates)->map(function ($date) {
+            return Carbon::parse($date)->format('F d, Y');
+        });
+
+        $lastIndexOfDate = count($formatted) - 1;
+
+        $formattedDate = "From {$formatted[0]} to {$formatted[$lastIndexOfDate]}";
+
+        $message = "Notice: Your booking (Ref: $reference_no) at $church has an event conflict.\n"
+                . "Event: $event_name\n"
+                . "Date: $formattedDate\n"
+                . "Please contact the church for details.";
+
+        $parameters = array(
+            'auth' => array(
+                'username' => "root",
+                'password' => "LACSONSMS"
+            ),
+            'provider' => "SIMNETWORK",
+            'number' => $contact,
+            'content' => $message,
+        );
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return $output;
+    }
+
 
 
 }

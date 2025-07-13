@@ -8,7 +8,7 @@ use App\Models\Admin;
 use Carbon\Carbon;
 use App\Services\SendingEmail;
 use App\Models\FileUpload;
-
+use App\Models\FullyBook;
 
 class SearchServiceController extends Controller
 {
@@ -133,6 +133,7 @@ class SearchServiceController extends Controller
         if((int)$church_id === 0){
             $result = Booking::with('user', 'church')
                                 ->whereIn('service_type', $service_types)
+                                ->where('status', 'Approved')
                                 ->orderBy('id', 'desc')
                                 ->get();
             return $result;
@@ -141,9 +142,25 @@ class SearchServiceController extends Controller
         $result = Booking::with('user', 'church')
                             ->where('church_id', $church_id)
                             ->whereIn('service_type', $service_types)
+                            ->where('status', 'Approved')
                             ->orderBy('id', 'desc')
                             ->get();
         return $result;
+    }
+    public function showAllEvent($church_id){
+        $result = [];
+
+        if((int)$church_id === 0){
+            $result = FullyBook::where('is_event', 1)
+                                ->get();
+            return $result;
+        }
+
+        $result = FullyBook::where('church_id', $church_id)
+                            ->where('is_event', 1)
+                            ->get();
+        return $result;
+
     }
 
     public function changeStatus(Request $request){

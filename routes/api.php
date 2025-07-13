@@ -29,6 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
 
     Route::put('/edit-profile', [UserController::class, 'update']);
 
+    Route::get('get-events/{searchStatus}', [ChurchController::class, 'findEvents']);
+
 
 });
 
