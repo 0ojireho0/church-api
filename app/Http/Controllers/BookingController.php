@@ -75,6 +75,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -158,6 +159,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -174,6 +176,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -246,6 +249,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -317,6 +321,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -388,6 +393,7 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'schedule',
+                'reservation_type' => 'Online',
                 'mop_status' => 'Not Paid'
             ]);
 
@@ -623,6 +629,250 @@ class BookingController extends Controller
 
     }
 
+
+    public function walkinMass(Request $request){
+
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+        $reserved_by = $request->reserved_by;
+
+        if($fullyBook !== "null"){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+            $result = Booking::create([
+                'walkin_name' => $reserved_by,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'reference_num' => strtotime('now'),
+                'service_type' => 'mass',
+                'mop' => $mop,
+                'status' => 'Approved',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'result' => $result
+        ]);
+
+
+    }
+
+    public function walkinBaptism(Request $request){
+
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+        $reserved_by = $request->reserved_by;
+
+        if($fullyBook !== "null"){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+            $result = Booking::create([
+                'walkin_name' => $reserved_by,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'reference_num' => strtotime('now'),
+                'service_type' => 'baptism',
+                'mop' => $mop,
+                'status' => 'Approved',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'result' => $result
+        ]);
+    }
+
+    public function walkinWedding(Request $request){
+
+        $church_id = $request->church_id;
+        $form_data = json_decode($request->jsonData);
+        $rehearsalFullyBooked = $request->rehearsalFullyBooked;
+        $rehearsal_date = $request->rehearsal_date;
+        $rehearsal_time = $request->rehearsal_time;
+        $selectedPayment = $request->selectedPayment;
+        $weddingFullyBooked = $request->weddingFullyBooked;
+        $wedding_date = $request->wedding_date;
+        $wedding_time = $request->wedding_time;
+        $reserved_by = $request->reserved_by;
+
+        if($rehearsalFullyBooked !== "null"){
+            FullyBook::create([
+                'date' => $rehearsalFullyBooked,
+                'church_id' => $church_id
+            ]);
+        }
+
+        if($weddingFullyBooked !== "null"){
+            FullyBook::create([
+                'date' => $weddingFullyBooked,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+            // Wedding
+            $wedding = Booking::create([
+                'walkin_name' => $reserved_by,
+                'church_id' => $church_id,
+                'date' => $wedding_date,
+                'reference_num' => strtotime("now"),
+                'time_slot' => $wedding_time,
+                'service_type' => 'wedding',
+                'mop' => $selectedPayment,
+                'status' => 'Approved',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+
+            // Rehearsal
+            Booking::create([
+                'walkin_name' => $reserved_by,
+                'wedding_rehearsal_id' => $wedding->id,
+                'church_id' => $church_id,
+                'reference_num' => $wedding->reference_num,
+                'date' => $rehearsal_date,
+                'time_slot' => $rehearsal_time,
+                'mop' => $selectedPayment,
+                'status' => 'Pending',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+
+
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'result' => $wedding
+        ]);
+
+
+    }
+
+    public function walkinMemorial(Request $request){
+
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+        $reserved_by = $request->reserved_by;
+
+        if($fullyBook !== "null"){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+            $result = Booking::create([
+                'walkin_name' => $reserved_by,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'reference_num' => strtotime('now'),
+                'service_type' => 'memorial',
+                'mop' => $mop,
+                'status' => 'Approved',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'result' => $result
+        ]);
+    }
+
+    public function walkinConfirmation(Request $request){
+
+        $form_data = json_decode($request->jsonData);
+        $dateBook = $request->date;
+        $time_slot = $request->selectedTime;
+        $mop = $request->selectedPayment;
+        $fullyBook = $request->fullyBooked;
+        $church_id = $request->church_id;
+        $reserved_by = $request->reserved_by;
+
+        if($fullyBook !== "null"){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        try {
+            $result = Booking::create([
+                'walkin_name' => $reserved_by,
+                'church_id' => $church_id,
+                'date' => $dateBook,
+                'time_slot' => $time_slot,
+                'reference_num' => strtotime('now'),
+                'service_type' => 'confirmation',
+                'mop' => $mop,
+                'status' => 'Approved',
+                'form_data' => $form_data,
+                'book_type' => 'schedule',
+                'reservation_type' => 'Walk-In',
+                'mop_status' => 'Paid',
+                'set_status' => 1
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return response()->json([
+            'result' => $result
+        ]);
+    }
 
 
 }

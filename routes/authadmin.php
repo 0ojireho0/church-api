@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminAuth\AuthenticatedSessionController;
 use App\Http\Controllers\SearchServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BookingController;
 
 Route::post('/register-admin', [RegisteredAdminController::class, 'store']);
 Route::post('/login-admin', [AuthenticatedSessionController::class, 'store']);
@@ -27,4 +28,10 @@ Route::middleware(['auth:admin'])->group(function(){
     Route::put('update-admin', [SearchServiceController::class, 'updateAdmin']);
 
     Route::put('/edit-profile', [UserController::class, 'updateAdmin']);
+
+    Route::post('walkin-mass', [BookingController::class, 'walkinMass']);
+    Route::post('walkin-baptism', [BookingController::class, 'walkinBaptism']);
+    Route::post('walkin-wedding', [BookingController::class, 'walkinWedding']);
+    Route::post('walkin-memorial', [BookingController::class, 'walkinMemorial']);
+    Route::post('walkin-confirmation', [BookingController::class, 'walkinConfirmation']);
 });

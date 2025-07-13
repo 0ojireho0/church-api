@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('request-certificate', [BookingController::class, 'requestCertificate']);
     Route::post('cancel-booking', [BookingController::class, 'cancelBooking']);
 
+
     Route::get('my-booking/{user_id}', [BookingController::class, 'myBooks']);
 
     Route::post('/chatbot', [ChatController::class, 'processMessage']);

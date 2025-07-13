@@ -26,7 +26,9 @@ class Booking extends Model
         'mop',
         'mop_status',
         'book_type',
-        'remarks'
+        'remarks',
+        'reservation_type',
+        'walkin_name'
     ];
 
     protected $casts = [
