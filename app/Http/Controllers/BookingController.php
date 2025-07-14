@@ -437,9 +437,8 @@ class BookingController extends Controller
     public function requestCertificate(Request $request){
         $form_data = json_decode($request->jsonData);
         $mop = $request->selectedPayment;
-        $user_id = $request->user['id'];
-        $church_id = $request->id;
-
+        (int) $user_id = $request->user_id;
+        (int) $church_id = $request->id;
 
         try {
 
@@ -455,12 +454,29 @@ class BookingController extends Controller
                 'mop_status' => 'Not Paid'
             ]);
 
+            if($request->hasFile('files')){
+                $files = $request->file('files');
+
+                foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $result->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $result->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $result->reference_num . '/' . $filename
+                    ]);
+                }
+            }
+
             // $user = User::findOrFail($user_id);
-            $church = Church::findOrFail($church_id);
+            // $church = Church::findOrFail($church_id);
 
-            $this->sendRequestCertEmail($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['email']);
+            // $this->sendRequestCertEmail($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['email']);
 
-            $this->sendRequestCertContact($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['contact']);
+            // $this->sendRequestCertContact($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['contact']);
 
 
 
@@ -621,7 +637,8 @@ class BookingController extends Controller
 
     public function myBooks($user_id){
 
-        $result = Booking::where('user_id', $user_id)
+        $result = Booking::with('user', 'files')
+                            ->where('user_id', $user_id)
                             ->whereNull('wedding_rehearsal_id')
                             ->get();
 
