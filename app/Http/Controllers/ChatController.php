@@ -41,7 +41,7 @@ class ChatController extends Controller
             empty($response['intents']) ||
             empty($response['entities'])
         ) {
-            return "I'm not sure about the answer. Try asking it a different way.";
+            return "Kindly rephrase your question";
         }
 
         $responseEntities = $response['entities'] ?? [];
@@ -105,7 +105,7 @@ class ChatController extends Controller
             }
         }else{
 
-            return "I’m not sure about the answer. Try asking it a different way.";
+            return "Kindly rephrase your question";
 
 
         }

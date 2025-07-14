@@ -24,6 +24,10 @@
             We recommend selecting an alternative date or contacting us for assistance.
         </p>
 
+        <p>
+            <strong>If you have already paid, please contact the church email for refund processing.</strong>
+        </p>
+
         <p style="margin-top: 30px;">Thank you for your understanding.</p>
 
         <p style="font-style: italic; color: #7f8c8d;">— {{ $church }} Team</p>

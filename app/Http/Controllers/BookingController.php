@@ -1023,8 +1023,7 @@ class BookingController extends Controller
         $emailer->send();
     }
 
-    public function notifySpecificUserSms($contact, $reference_no, $church, $event_name, $fulldates)
-    {
+    public function notifySpecificUserSms($contact, $reference_no, $church, $event_name, $fulldates){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
 
         $formatted = collect($fulldates)->map(function ($date) {
@@ -1057,6 +1056,79 @@ class BookingController extends Controller
         curl_close($ch);
 
         return $output;
+    }
+
+    public function submitAnotherBook(Request $request){
+        $id = $request->id;
+        $fullyBook = $request->fullyBooked;
+        $selectedDate = $request->selectedDate;
+        $selectedTime = $request->selectedTime;
+        $church_id = $request->church_id;
+
+
+        if($fullyBook !== null){
+            FullyBook::create([
+                'date' => $fullyBook,
+                'church_id' => $church_id
+            ]);
+        }
+
+        $findId = Booking::where('id', $id)->firstOrFail();
+        $findId['date'] = $selectedDate;
+        $findId['time_slot'] = $selectedTime;
+        $findId['status'] = "Approved";
+        $findId['set_status'] = 1;
+        $findId->save();
+
+        $this->notifyUserEmailAnotherBook($findId->user['email'], $findId->reference_num, $findId->user['name'], $findId->church['church_name'], $findId->date, $findId->time_slot, $findId->service_type);
+        $this->notifyUserSmsAnotherBook($findId->user['contact'], $findId->reference_num, $findId->user['name'], $findId->church['church_name'], $findId->date, $findId->time_slot, $findId->service_type);
+
+
+
+    }
+
+    public function notifyUserEmailAnotherBook($email, $reference_no, $username, $church_name, $date, $time_slot, $service_type){
+        $formattedDate = Carbon::parse($date)->format('F d, Y');
+        $formattedTime = Carbon::parse($time_slot)->format('h:i A');
+
+        // Render Blade view to string
+        $body = view('notify-user-another-book', [
+            'email' => $email,
+            'refno' => $reference_no,
+            "username" => $username,
+            'churchname' => $church_name,
+            'date' => $formattedDate,
+            'time_slot' => $formattedTime,
+            'service_type' => $service_type
+        ]);
+
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "Submit Another Booking - $reference_no");
+        $emailer->send();
+    }
+
+    public function notifyUserSmsAnotherBook($contact, $reference_no, $username, $church_name, $date, $time_slot, $service_type){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+        $formattedDate = Carbon::createFromFormat('Y-m-d', $date)->format('F j, Y');
+        $formattedTime = Carbon::createFromFormat('H:i:s', $time_slot)->format('g:iA');
+        $firstUpperLtr = ucfirst(trim($service_type));
+
+        $message = "Dear $username, your booking has been successfully rebooked via ChurchConnect.\n\nReference #: $reference_no for $firstUpperLtr on {$formattedDate} at {$formattedTime} at $church_name\n\nKind regards,\nChurchConnect Team";
+
+
+        $parameters = array(
+            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'provider' => "SIMNETWORK",
+            'number' => $contact,
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
     }
 
 
