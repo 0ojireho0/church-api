@@ -227,7 +227,7 @@ class SearchServiceController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK",
+            'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
           );
@@ -272,7 +272,7 @@ class SearchServiceController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK",
+            'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
           );
@@ -329,7 +329,7 @@ class SearchServiceController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK",
+            'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
           );
@@ -364,7 +364,7 @@ class SearchServiceController extends Controller
 
         $parameters = array(
             'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
-            'provider' => "SIMNETWORK",
+            'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
           );
