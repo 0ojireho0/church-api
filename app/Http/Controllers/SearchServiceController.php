@@ -226,7 +226,7 @@ class SearchServiceController extends Controller
         $message = "Dear $fullname, your booking via ChurchConnect has been approved.\n\nReference #: $ref_no for $firstUpperLtr on {$formattedDate} {$formattedTime} at $churchname\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -271,7 +271,7 @@ class SearchServiceController extends Controller
         $message = "Dear $fullname\n\nWe regret to inform you that your request for a $firstUpperLtr submitted through ChurchConnect has been rejected at $churchname due to the following reason(s):\n\n $remarks \n\nYou may contact the parish office for clarification\n\nReference #:$ref_no\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -328,7 +328,7 @@ class SearchServiceController extends Controller
         $message = "Dear $fullname, your certificate request has been approved.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nClaim at: Parish Office\nOffice Hours: [e.g., Mon - Fri, 9:00 AM - 4:00 PM]\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -363,7 +363,7 @@ class SearchServiceController extends Controller
         $message = "Dear $fullname, your certificate request has been rejected.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nReason: $remarks\n\nPlease contact the parish office\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,

@@ -517,7 +517,7 @@ class BookingController extends Controller
         $message = 'This is to confirm that your booking has been cancelled as per your request. Your reference number is ' . $ref_no;
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -557,7 +557,7 @@ class BookingController extends Controller
         $message = "Dear $username, your booking via ChurchConnect is confirmed.\n\nReference #: $ref_no for $firstUpperLtr on {$formattedDate} {$formattedTime} at $churchname\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -620,7 +620,7 @@ class BookingController extends Controller
 
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -994,7 +994,7 @@ class BookingController extends Controller
 
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
@@ -1058,8 +1058,8 @@ class BookingController extends Controller
 
         $parameters = array(
             'auth' => array(
-                'username' => "root",
-                'password' => "LACSONSMS"
+                'username' => env('SMS_USERNAME'),
+                'password' => env('SMS_PASSWORD')
             ),
             'provider' => "SIMNETWORK2",
             'number' => $contact,
@@ -1134,7 +1134,7 @@ class BookingController extends Controller
 
 
         $parameters = array(
-            'auth' => array('username' => "root", 'password' => "LACSONSMS"), //Your API KEY
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
             'provider' => "SIMNETWORK2",
             'number' => $contact,
             'content' => $message,
