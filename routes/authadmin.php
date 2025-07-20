@@ -7,6 +7,7 @@ use App\Http\Controllers\SearchServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CertificateController;
 
 Route::post('/register-admin', [RegisteredAdminController::class, 'store']);
 Route::post('/login-admin', [AuthenticatedSessionController::class, 'store']);
@@ -39,4 +40,7 @@ Route::middleware(['auth:admin'])->group(function(){
 
     Route::post('select-event', [BookingController::class, 'selectEvent']);
     Route::post('findEventAdded', [BookingController::class, 'findEventAdded']);
+
+    Route::post('add-new-cert', [CertificateController::class, 'addNewCertificate']);
+    Route::get('show-certificate/{status}', [CertificateController::class, 'showCert']);
 });

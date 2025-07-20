@@ -172,9 +172,6 @@ class SearchServiceController extends Controller
 
         $result = Booking::with('user', 'church')->findOrFail($id);
 
-
-
-
         if($status == "Approved" && $result->book_type == "schedule"){
             $this->sendApprovedBookContact($result->user['name'], $result->service_type, $result->reference_num, $result->date, $result->time_slot, $result->church['church_name'], $result->user['contact']);
 
@@ -197,7 +194,7 @@ class SearchServiceController extends Controller
         }
 
         if($status == "Rejected" && $result->book_type == 'certificate'){
-           $this->sendRejectedCertificateEmail($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['email'], $remarks);
+            $this->sendRejectedCertificateEmail($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['email'], $remarks);
 
             $this->sendRejectedCertificateContact($result->user['name'], $result->church['church_name'], $result->form_data['services'], $result->reference_num, $result->user['contact'], $remarks);
         }
@@ -206,8 +203,15 @@ class SearchServiceController extends Controller
 
         $result->update([
             'status' => $status,
-            'mop_status' => $status === "Approved" ? "Paid" : $isPaid,
-            'set_status' => 1,
+            'mop_status' => ($result->book_type === "schedule" && $status === "Approved")
+                            ? "Paid"
+                            : (($result->book_type === "certificate" && $status === "Approved")
+                                ? "Pending"
+                                : (($result->book_type === "certificate" && $status === "Rejected")
+                                    ? "Not Paid"
+                                    : $isPaid)),
+
+            'set_status' => $result->book_type === "certificate" && $status === "Approved" ? 3 : 1,
             'remarks' => $remarks
         ]);
 
@@ -325,7 +329,7 @@ class SearchServiceController extends Controller
     public function sendApprovedCertificateContact($fullname, $churchname, $cert_type, $ref_no, $contact){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
         $certList = implode(', ', $cert_type);
-        $message = "Dear $fullname, your certificate request has been approved.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nClaim at: Parish Office\nOffice Hours: [e.g., Mon - Fri, 9:00 AM - 4:00 PM]\n\nKind Regards,\nChurchConnect Team";
+        $message = "Dear $fullname, your certificate request has been approved.\n\nYou may now set a Mode of Payment in your My Bookings tab to process your Requested Certificate.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nClaim at: $churchname\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
             'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY

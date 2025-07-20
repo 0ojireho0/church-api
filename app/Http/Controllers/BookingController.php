@@ -451,7 +451,8 @@ class BookingController extends Controller
                 'status' => 'Pending',
                 'form_data' => $form_data,
                 'book_type' => 'certificate',
-                'mop_status' => 'Not Paid'
+                'mop_status' => 'Not Paid',
+                'reservation_type' => 'Online'
             ]);
 
             if($request->hasFile('files')){
@@ -471,12 +472,12 @@ class BookingController extends Controller
                 }
             }
 
-            // $user = User::findOrFail($user_id);
-            // $church = Church::findOrFail($church_id);
+            $user = User::findOrFail($user_id);
+            $church = Church::findOrFail($church_id);
 
-            // $this->sendRequestCertEmail($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['email']);
+            $this->sendRequestCertEmail($user->name, $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $user->email);
 
-            // $this->sendRequestCertContact($request->user['name'], $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $request->user['contact']);
+            $this->sendRequestCertContact($user->name, $result->form_data['services'], $result->created_at, $church->church_name, $result->reference_num, $user->contact);
 
 
 
@@ -1132,6 +1133,100 @@ class BookingController extends Controller
 
         $message = "Dear $username, your booking has been successfully rebooked via ChurchConnect.\n\nReference #: $reference_no for $firstUpperLtr on {$formattedDate} at {$formattedTime} at $church_name\n\nKind regards,\nChurchConnect Team";
 
+
+        $parameters = array(
+            'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
+            'provider' => "SIMNETWORK2",
+            'number' => $contact,
+            'content' => $message,
+          );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        //Send the parameters set above with the request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
+
+        // Receive response from server
+        $output = curl_exec($ch);
+        curl_close($ch);
+    }
+
+    public function certificateMOP(Request $request){
+
+        $book_id = $request->id;
+        $mop = $request->mop;
+
+        $findBooking = Booking::with('user')->where('id', $book_id)->get()->firstOrFail();
+
+        $findBooking['mop'] = $mop;
+        $findBooking['mop_status'] = "Paid";
+        $findBooking['set_status'] = 4;
+
+        $findBooking->save();
+
+        if($request->hasFile('files')){
+            $files = $request->file('files');
+
+            foreach($files as $file){
+                    $filename = $file->getClientOriginalName();
+                    Storage::disk('llibiapp_dms')->put(
+                        'service/' . $findBooking->reference_num . '/' . $filename,
+                        file_get_contents($file)
+                    );
+                    FileUpload::create([
+                        'book_id' => $findBooking->id,
+                        'filename' => $filename,
+                        'filepath' => env('DO_LLIBI_CDN_ENDPOINT_DMS') . '/service/' . $findBooking->reference_num . '/' . $filename
+                    ]);
+                }
+
+
+
+        }
+
+        $this->sendCertificateMOPEmail($findBooking->user['name'], $findBooking->mop_status, $findBooking->mop, $findBooking->reference_num, $findBooking->user['email']);
+
+        $this->sendCertificateMOPSms($findBooking->user['name'], $findBooking->mop_status, $findBooking->mop, $findBooking->reference_num, $findBooking->user['contact']);
+
+        $this->sendCertificateMOPAdminEmail($findBooking->user['name'], $findBooking->mop_status, $findBooking->mop, $findBooking->reference_num);
+
+        return response()->json([
+            'success' => true
+        ]);
+
+
+    }
+
+    public function sendCertificateMOPEmail($fullname, $mop_status, $mop, $reference_no, $email){
+
+        // Render Blade view to string
+        $body = view('send-certificate-mop', [
+            'fullname' => $fullname,
+            'mop_status' => $mop_status,
+            "mop" => $mop,
+            'reference_no' => $reference_no,
+        ]);
+
+        $emailer = new SendingEmail(email: $email, body: $body, subject: "Mode of Payment - $reference_no");
+        $emailer->send();
+    }
+
+    public function sendCertificateMOPAdminEmail($fullname, $mop_status, $mop, $reference_no){
+
+        $body = view('send-certificate-mop-admin', [
+            'fullname' => $fullname,
+            'mop_status' => $mop_status,
+            "mop" => $mop,
+            'reference_no' => $reference_no,
+        ]);
+
+        $emailer = new SendingEmail(email: "churchconnect05@gmail.com", body: $body, subject: "New Payment Added - $reference_no");
+        $emailer->send();
+    }
+
+    public function sendCertificateMOPSms($fullname, $mop_status, $mop, $reference_no, $contact){
+        $ch = curl_init('http://192.159.66.221/goip/sendsms/');
+
+
+        $message = "Hello $fullname, your payment via $mop is currently marked as $mop_status.\n\nReference No: $reference_no.";
 
         $parameters = array(
             'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY

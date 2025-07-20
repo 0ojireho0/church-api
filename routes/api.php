@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\UserController;
 
+
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -31,6 +32,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::put('/edit-profile', [UserController::class, 'update']);
 
     Route::get('get-events/{searchStatus}', [ChurchController::class, 'findEvents']);
+
+    Route::post('/certificateMOP', [BookingController::class, 'certificateMOP']);
+
+
 
 
 });

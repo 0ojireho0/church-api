@@ -19,7 +19,7 @@
         has been approved by {{ $churchname }}.
     </p>
 
-    <p>You may now claim your certificate at the parish office during office hours. Kindly present your reference number upon claiming.</p>
+    <p>You may now set a Mode of Payment in your <b>My Bookings</b> tab to process your Requested Certificate</p>
 
     <p>Details: </p>
     <ul>
@@ -33,7 +33,7 @@
         <li>Reference No: <b>{{$reference_no}}</b></li>
         <li>Church: <b>{{$churchname}}</b></li>
         <li>Status: <b>Approved</b></li>
-        <li>Claiming Hours: <b>[e.g., Mon–Fri, 9:00 AM–4:00 PM]</b></li>
+        {{-- <li>Claiming Hours: <b>[e.g., Mon–Fri, 9:00 AM–4:00 PM]</b></li> --}}
     </ul>
 
     <p>For any questions, feel free to contact us at (email@gmail.com)</p>
