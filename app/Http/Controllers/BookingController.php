@@ -445,7 +445,7 @@ class BookingController extends Controller
             $result = Booking::create([
                 'user_id' => $user_id,
                 'church_id' => $church_id,
-                'service_type' => 'certificate',
+                'service_type' => $form_data->services,
                 'reference_num' => strtotime('now'),
                 'mop' => $mop,
                 'status' => 'Pending',
@@ -616,8 +616,8 @@ class BookingController extends Controller
     public function sendRequestCertContact($fullname, $cert_type, $created_at, $churchname, $ref_no, $contact){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
 
-        $certList = implode(', ', $cert_type);
-        $message ="Dear $fullname,\n\nYour request for a $certList at $churchname via ChurchConnect has been received and is under review.\n\nReference #: $ref_no\n\nYou will be notified once processing is complete.\n\nKind Regards,\nChurchConnect Team";
+        // $certList = implode(', ', $cert_type);
+        $message ="Dear $fullname,\n\nYour request for a $cert_type at $churchname via ChurchConnect has been received and is under review.\n\nReference #: $ref_no\n\nYou will be notified once processing is complete.\n\nKind Regards,\nChurchConnect Team";
 
 
         $parameters = array(

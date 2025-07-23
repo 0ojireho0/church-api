@@ -12,9 +12,7 @@
     <p>Dear <b>{{ $fullname }}</b>, </p>
     <p>We have received your request for a
         <b>
-            @foreach ($cert_type as $type)
-                {{ $loop->first ? '' : ', ' }}{{ $type }}
-            @endforeach
+            {{ $cert_type }}
         </b>
         through ChurchConnect. It is now under review by the parish office.
     </p>
@@ -23,9 +21,7 @@
     <ul>
         <li>Certificate Type:
             <b>
-                @foreach ($cert_type as $type)
-                    {{ $loop->first ? '' : ', ' }}{{ $type }}
-                @endforeach
+                {{ $cert_type }}
             </b>
         </li>
         <li>Date Submitted: <b> {{ $created_at }} </b></li>

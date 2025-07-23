@@ -328,8 +328,7 @@ class SearchServiceController extends Controller
 
     public function sendApprovedCertificateContact($fullname, $churchname, $cert_type, $ref_no, $contact){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
-        $certList = implode(', ', $cert_type);
-        $message = "Dear $fullname, your certificate request has been approved.\n\nYou may now set a Mode of Payment in your My Bookings tab to process your Requested Certificate.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nClaim at: $churchname\n\nKind Regards,\nChurchConnect Team";
+        $message = "Dear $fullname, your certificate request has been approved.\n\nYou may now set a Mode of Payment in your My Bookings tab to process your Requested Certificate.\n\nType: $cert_type\nChurch: $churchname\nRef No.: $ref_no\nClaim at: $churchname\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
             'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY
@@ -363,8 +362,7 @@ class SearchServiceController extends Controller
 
     public function sendRejectedCertificateContact($fullname, $churchname, $cert_type, $ref_no, $contact, $remarks){
         $ch = curl_init('http://192.159.66.221/goip/sendsms/');
-        $certList = implode(', ', $cert_type);
-        $message = "Dear $fullname, your certificate request has been rejected.\n\nType: $certList\nChurch: $churchname\nRef No.: $ref_no\nReason: $remarks\n\nPlease contact the parish office\n\nKind Regards,\nChurchConnect Team";
+        $message = "Dear $fullname, your certificate request has been rejected.\n\nType: $cert_type\nChurch: $churchname\nRef No.: $ref_no\nReason: $remarks\n\nPlease contact the parish office\n\nKind Regards,\nChurchConnect Team";
 
         $parameters = array(
             'auth' => array('username' => env('SMS_USERNAME'), 'password' => env('SMS_PASSWORD')), //Your API KEY

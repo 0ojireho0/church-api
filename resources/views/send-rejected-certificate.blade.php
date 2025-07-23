@@ -12,9 +12,7 @@
 
     <p>We regret to inform you that your request for a
         <b>
-            @foreach ($cert_type as $type)
-                {{ $loop->first ? '' : ', ' }}{{ $type }}
-            @endforeach
+            {{ $cert_type }}
         </b>
         submitted through ChurchConnect has been rejected due to the following reason(s):
     </p>
@@ -27,9 +25,7 @@
     <ul>
         <li>Certificate Type:
             <b>
-                @foreach ($cert_type as $type)
-                    {{ $loop->first ? '' : ', ' }}{{ $type }}
-                @endforeach
+                {{ $cert_type }}
             </b>
         </li>
         <li>Reference No: <b>{{$reference_no}}</b></li>
